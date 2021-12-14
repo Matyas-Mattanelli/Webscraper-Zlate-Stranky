@@ -32,7 +32,7 @@ Our project has three main goals:
 
 * Start with OOP (Matyáš)
 
-### What to do until Christmas + New Year's Eve 🎄 🎆🎇
+### What to do until Christmas 🎄 + New Year's Eve 🎆🎇
 
 *
 
@@ -43,3 +43,5 @@ Our project has three main goals:
 ## Notes
 
 * Not every restaurant has full information available - this might cause problems while scraping
+* The code might be usable for other districts than just Prague
+* 
