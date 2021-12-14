@@ -16,11 +16,11 @@ Our project has three main goals:
 
 * To provide funcionality to the data, which may be missing from zlatestranky.cz. This might include e.g. possibility to list the restaurants according to ratings, filter them by available payment method or check wheather the restaurant is open at a given time.
 
-## Question for the project discussion
+## Questions for the project discussion
 
-* **Is it better to define class the return entire dataset or, alteratively class called Restaurant (each individual restaurant will be instance of this class)?**
+* **Is it better to define class that will return entire dataset or, alteratively class called Restaurant (each individual restaurant will be instance of this class)?**
 
-* Is the sample project provided the benchmark, should we take it minimum requirement, or the state-of-the-arts? 
+* Is the sample project provided the benchmark, should we take it as a minimum requirement, or rather as the state-of-the-arts? 
 
 ## Master Plan 💪
 
@@ -31,6 +31,14 @@ Our project has three main goals:
 * Write license (Honza)
 
 * Start with OOP (Matyáš)
+
+### What to do until Christmas + New Year's Eve 🎄 🎆🎇
+
+*
+
+### What to do until Deadline ☠
+
+*
 
 ## Notes
 
