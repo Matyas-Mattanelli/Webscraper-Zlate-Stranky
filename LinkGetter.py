@@ -43,7 +43,7 @@ class LinkGetter:
             links.append(f'https://www.zlatestranky.cz{title.find("a")["href"]}')
         return links
     
-    def getRequestsFromAllPages(self):
+    def getRequestsFromAllPages(*self):
         """
         A function to get the requests from all available pages 
         """
