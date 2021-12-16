@@ -20,7 +20,9 @@ Our project has three main goals:
 
 * **Is it better to define class that will return entire dataset or, alteratively class called Restaurant (each individual restaurant will be instance of this class)?**
 
-* Is the sample project provided the benchmark, should we take it as a minimum requirement, or rather as the state-of-the-arts? 
+* Is the sample project provided the benchmark, should we take it as a minimum requirement, or rather as the state-of-the-arts?
+
+* Is it better to call a method right away when initializing a class (i.e. include it in the \_\_init__ constructor) or create an instance first and then call it?
 
 ## Master Plan 💪
 
