@@ -25,25 +25,25 @@ class LinkGetter:
         """
         Creates an object with an attribute self.links containing the retrieved links
         """
-        self.links=[]
+        self.links=self.getLinks()
     
     def getLinks(self):
         """
         A function to retrieve the links 
         """
-        request_list=self.getRequestsFromAllPages()
+        request_list=self.getRequestsFromAllPages(self)
         soup_list=[]
         for request in request_list:
             soup_list.append(BeautifulSoup(request))
         titles_soup=[]
         for soup in soup_list:
-            titles_soup.extend(soup.findall("h3"))
+            titles_soup.extend(soup.find_all("h3"))
         links=[]
         for title in titles_soup:
             links.append(f'https://www.zlatestranky.cz{title.find("a")["href"]}')
-        self.links=links
+        return links
     
-    def getRequestsFromAllPages():
+    def getRequestsFromAllPages(self):
         """
         A function to get the requests from all available pages 
         """
@@ -60,4 +60,3 @@ class LinkGetter:
             else:
                 print(f'Successfuly requested {i-1} pages')
         return request_list
-
