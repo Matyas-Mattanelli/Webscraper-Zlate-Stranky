@@ -31,6 +31,9 @@ class Restaurant:
     opening_hours_span : dict
         The total opening time for each day of the week
 
+    email_address : str
+        The restaurant's email address
+
     Methods
     -------
     getSoup():
@@ -56,6 +59,9 @@ class Restaurant:
 
     openingHoursToSpan(opening_hours)
         A function to convert the opening hours into a number
+
+    getEmail(soup)
+        A function to retrive the email address    
     """
     def __init__(self,link):
         """
@@ -73,6 +79,7 @@ class Restaurant:
         self.review_count=self.getReviewCount(self.soup)
         self.opening_hours=self.getOpeningHours(self.soup)
         self.opening_hours_span=self.openingHoursToSpan(self.opening_hours)
+        self.email_address=self.getEmail(self.soup)
     
     def getSoup(self,link):
         """
@@ -230,5 +237,23 @@ class Restaurant:
         """
         span_dict={key:self.rangeToNumber(value) for (key,value) in opening_hours.items()}
         return span_dict
+
+    def getEmail(self,soup):
+        """
+        A function to retrive the email address
+
+        Parameters
+        ----------
+        soup : A Beautiful Soup object
+            A Beatiful Soup object created from the request sent to the restaurants page
+
+        Returns
+        -------
+        email : str
+            The restaurant's email address
+        """
+        email_address=soup.find('a', {'data-ta':'EmailClick'}).text
+        return email_address
+
 
 
