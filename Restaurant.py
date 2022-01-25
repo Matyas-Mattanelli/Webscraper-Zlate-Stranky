@@ -249,7 +249,7 @@ class Restaurant:
 
         Returns
         -------
-        email : str
+        email_address : str
             The restaurant's email address
         """
         email_address=soup.find('a', {'data-ta':'EmailClick'}).text
