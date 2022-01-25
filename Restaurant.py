@@ -2,6 +2,7 @@ from tkinter.messagebox import NO
 import requests
 from bs4 import BeautifulSoup
 import re
+import json
 
 class Restaurant:
     """
@@ -51,7 +52,10 @@ class Restaurant:
             List of available services
 
     marks : list or none
-            List of available marks                  
+            List of available marks
+
+    coordinates : dict or None
+            Dictionary of coordinates (latitude and longitude)
 
     Methods
     -------
@@ -96,6 +100,9 @@ class Restaurant:
 
     getServicesSeparator(category)
         A function that accepts one of the three categories: 'Produkty', 'Služby', 'Značky', and picks the items from the list created by getServicesMarksProducts() between the specified category and the next one.
+
+    getCoordinates(soup)
+        A function to retrive coordinates of a restaurant    
     """
     def __init__(self,link):
         """
@@ -120,6 +127,7 @@ class Restaurant:
         self.products=self.getServicesSeparator('Produkty')
         self.services=self.getServicesSeparator('Služby')
         self.marks=self.getServicesSeparator('Značky')
+        self.coordinates=self.getCoordinates(self.soup)
     
     def getSoup(self,link):
         """
@@ -449,3 +457,27 @@ class Restaurant:
 
             else: #when the category is specified, the items will return
                 return(items)
+
+    def getCoordinates(self,soup):
+        '''
+        A function to retrive coordinates of a restaurant
+        
+        Parameters
+        ----------
+        soup : A Beautiful Soup object
+            A Beatiful Soup object created from the request sent to the restaurants page
+
+        Returns
+        -------
+        coordinates : dict or None
+            Dictionary of coordinates (latitude and longitude)
+        '''
+        div_coordinates=soup.find('div',{'class':'map'})
+        if div_coordinates == None:
+            coordinates = None
+            return coordinates
+        else: 
+            coordinates={}
+            coordinates['latitude']=json.loads(div_coordinates['data-centerpoi'])['lat']
+            coordinates['longitude']=json.loads(div_coordinates['data-centerpoi'])['lng']
+            return coordinates
