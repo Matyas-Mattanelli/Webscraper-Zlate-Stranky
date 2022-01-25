@@ -1,3 +1,4 @@
+from tkinter.messagebox import NO
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -40,6 +41,9 @@ class Restaurant:
     web_page : str or None
         Link for restaurant's own web page
 
+    payment_methods : list or None
+            List of available payment methods
+
     Methods
     -------
     getSoup():
@@ -74,6 +78,9 @@ class Restaurant:
 
     getWebPage(soup)
         A function to retrive a link for restaurant's own web page
+
+    getPaymentMethods(soup)
+        A function to retrive payment methods available in a restaurant
     """
     def __init__(self,link):
         """
@@ -94,6 +101,7 @@ class Restaurant:
         self.email_address=self.getEmail(self.soup)
         self.phones=self.getPhone(self.soup)
         self.web_page=self.getWebPage(self.soup)
+        self.payment_methods=self.getPaymentMethods(self.soup)
     
     def getSoup(self,link):
         """
@@ -308,7 +316,7 @@ class Restaurant:
 
             return phones
 
-    def getWebPage(self, soup):
+    def getWebPage(self,soup):
         '''
         A function to retrive a link for restaurant's own web page
 
@@ -328,3 +336,29 @@ class Restaurant:
         else:
             web_page = soup.find('a', {'data-ta':'LinkClick'})['href']
             return web_page
+
+    def getPaymentMethods(self,soup):
+        '''
+        A function to retrive payment methods available in a restaurant
+
+        Parameters
+        ----------
+        soup : A Beautiful Soup object
+            A Beatiful Soup object created from the request sent to the restaurants page
+
+        Returns
+        -------
+        payment_methods : list or None
+            List of available payment methods
+        '''
+        if soup.find('h2', text='Platební metody') == None:
+            payment_methods = None
+            return payment_methods
+        else:
+            payment_methods_raw = soup.find('h2', text='Platební metody').find_next_sibling('ul', {'class':'list-inline'}).find_all('li') #finding list of payment methods (wraped in <li><\li>)
+            payment_methods = [] #empty list to be used in the next for loop
+
+            for i in payment_methods_raw: #unwraping the <li>
+                payment_methods.append(i.text)
+
+            return payment_methods #list containing strings, representing individual payment methods
