@@ -31,8 +31,14 @@ class Restaurant:
     opening_hours_span : dict
         The total opening time for each day of the week
 
-    email_address : str
+    email_address : str or None
         The restaurant's email address
+
+    phones : dict or None
+        Phone nubers and their labels in a dictionary
+
+    web_page : str or None
+        Link for restaurant's own web page
 
     Methods
     -------
@@ -62,6 +68,12 @@ class Restaurant:
 
     getEmail(soup)
         A function to retrive the email address    
+
+    getPhone(soup)
+        A function to retrive the telephone numbers and their labels
+
+    getWebPage(soup)
+        A function to retrive a link for restaurant's own web page
     """
     def __init__(self,link):
         """
@@ -69,8 +81,8 @@ class Restaurant:
 
         Parameters
         ----------
-            link : str
-                link to the restaurants page
+        link : str
+            link to the restaurants page
         """
         self.soup=self.getSoup(link)
         self.name=self.getName(self.soup)
@@ -80,6 +92,8 @@ class Restaurant:
         self.opening_hours=self.getOpeningHours(self.soup)
         self.opening_hours_span=self.openingHoursToSpan(self.opening_hours)
         self.email_address=self.getEmail(self.soup)
+        self.phones=self.getPhone(self.soup)
+        self.web_page=self.getWebPage(self.soup)
     
     def getSoup(self,link):
         """
@@ -249,13 +263,68 @@ class Restaurant:
 
         Returns
         -------
-        email_address : str
+        email_address : str or None
             The restaurant's email address
         """
-        try:
+        if soup.find('a', {'data-ta':'EmailClick'}) == None:
+            email_address=None
+            return email_address
+        else:
             email_address=soup.find('a', {'data-ta':'EmailClick'}).text
             return email_address
-        except AttributeError:
-            email_address = None
-            return email_address
 
+
+    def getPhone(self,soup):
+        """
+        A function to retrive the telephone numbers and their labels
+
+        Parameters
+        ----------
+        soup : A Beautiful Soup object
+            A Beatiful Soup object created from the request sent to the restaurants page
+
+        Returns
+        -------
+        phones : dict or None
+            Phone nubers and their labels in a dictionary
+        """
+        if soup.find('td', {'itemprop':'telephone'}).text == None:
+            phones = None
+            return phones
+        else:
+            telephone_numbers = []
+            telephone_names = []
+
+            #extracting telephone numbers:
+            all_telephones = soup.find_all('td', {'itemprop':'telephone'})
+            for i in all_telephones:
+                telephone_numbers.append(i.text)
+
+            #extracting telephone names:
+            for i in telephone_numbers:
+                telephone_names.append(soup.find('td', text=i).find_next_sibling('td').text)
+
+            phones = {telephone_names[i]: telephone_numbers[i] for i in range(len(telephone_numbers))}
+
+            return phones
+
+    def getWebPage(self, soup):
+        '''
+        A function to retrive a link for restaurant's own web page
+
+        Parameters
+        ----------
+        soup : A Beautiful Soup object
+            A Beatiful Soup object created from the request sent to the restaurants page
+
+        Returns
+        -------
+        web_page : str or None
+            Link for restaurant's own web page
+        '''
+        if soup.find('a', {'data-ta':'LinkClick'}) == None:
+            web_page = None
+            return web_page
+        else:
+            web_page = soup.find('a', {'data-ta':'LinkClick'})['href']
+            return web_page
