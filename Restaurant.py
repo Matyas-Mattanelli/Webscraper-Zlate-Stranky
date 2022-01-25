@@ -44,6 +44,15 @@ class Restaurant:
     payment_methods : list or None
             List of available payment methods
 
+    products : list or none
+            List of available products
+
+    services : list or none
+            List of available services
+
+    marks : list or none
+            List of available marks                  
+
     Methods
     -------
     getSoup():
@@ -81,6 +90,12 @@ class Restaurant:
 
     getPaymentMethods(soup)
         A function to retrive payment methods available in a restaurant
+
+    getServicesMarksProducts(soup)
+        This function extracts all children of the "Produkty+Služby+Značky" panel and puts them to one list
+
+    getServicesSeparator(category)
+        A function that accepts one of the three categories: 'Produkty', 'Služby', 'Značky', and picks the items from the list created by getServicesMarksProducts() between the specified category and the next one.
     """
     def __init__(self,link):
         """
@@ -102,6 +117,9 @@ class Restaurant:
         self.phones=self.getPhone(self.soup)
         self.web_page=self.getWebPage(self.soup)
         self.payment_methods=self.getPaymentMethods(self.soup)
+        self.products=self.getServicesSeparator('Produkty')
+        self.services=self.getServicesSeparator('Služby')
+        self.marks=self.getServicesSeparator('Značky')
     
     def getSoup(self,link):
         """
@@ -362,3 +380,72 @@ class Restaurant:
                 payment_methods.append(i.text)
 
             return payment_methods #list containing strings, representing individual payment methods
+
+    def getServicesMarksProducts(self,soup):
+        '''
+        This function extracts all children of the "Produkty+Služby+Značky" panel and puts them to one list. This list is then used in the getServicesSeparator(). The function is not ment to be used on its own.
+
+        Parameters
+        ----------
+        soup : A Beautiful Soup object
+            A Beatiful Soup object created from the request sent to the restaurants page
+
+        Returns
+        -------
+        ServicesMarksProducts : list or None
+            List containing all children of the "Produkty+Služby+Značky" panel
+        '''
+        if soup.find('div', {'class':'col-sm-12 tagcloud'}) == None:
+            ServicesMarksProducts = None
+        else:
+            ServicesMarksProducts_raw = soup.find('div', {'class':'col-sm-12 tagcloud'}).find_all() #finding all children of the panel "Produkty+Služby+Značky"
+            ServicesMarksProducts = []
+
+            for i in ServicesMarksProducts_raw:
+                ServicesMarksProducts.append(i.text)
+            
+            return ServicesMarksProducts
+
+
+    def getServicesSeparator(self, category):
+        '''
+        A function that accepts one of the three categories: 'Produkty', 'Služby', 'Značky', and picks the items from the list created by getServicesMarksProducts() between the specified category and the next one.
+        
+        Parameters
+        ----------
+        category : 'Produkty' or 'Služby' or 'Značky'
+            One of the three str objects specifing three categories. In case more categories are discovered, they will have to be addted manually.
+
+        Returns
+        -------
+        items : list or None
+            List containing items in the specified category
+        '''
+        ServicesMarksProducts = self.getServicesMarksProducts(self.soup)
+        if ServicesMarksProducts == None:
+             items = None
+             return items
+        else:
+            try:
+                ##defining the helper list of positions of categories
+                services_index_list = []
+
+                for i in ['Produkty', 'Služby', 'Značky']: #<-- in case of more categories, add here! (and also in the __init__)
+                    if i in ServicesMarksProducts:
+                        services_index_list.append(ServicesMarksProducts.index(i))   
+
+                services_index_list.sort()
+
+                ##selecting particular items
+                if ServicesMarksProducts.index(category) == max(services_index_list):
+                    items = ServicesMarksProducts[ServicesMarksProducts.index(category)+1:] #case when the given category is last in the ServicesMarksProducts list
+                else:
+                    items = ServicesMarksProducts[ServicesMarksProducts.index(category)+1:services_index_list[services_index_list.index(ServicesMarksProducts.index(category))+1]]
+                    #when the given category is not last, subset the part of ServicesMarksProducts list between the given category and the next category
+            
+            except ValueError: #In case that retaurant does not have given category specified, None will return
+                items = None
+                return items
+
+            else: #when the category is specified, the items will return
+                return(items)
