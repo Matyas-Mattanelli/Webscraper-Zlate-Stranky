@@ -346,7 +346,7 @@ class Restaurant:
         phones : dict or None
             Phone nubers and their labels in a dictionary
         """
-        if soup.find('td', {'itemprop':'telephone'}).text == None:
+        if soup.find('td', {'itemprop':'telephone'}) == None:
             phones = None
             return phones
         else:
