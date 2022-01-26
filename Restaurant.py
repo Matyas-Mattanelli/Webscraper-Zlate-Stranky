@@ -15,16 +15,16 @@ class Restaurant:
     soup : A Beautiful Soup object
         A request converted into a Beautiful Soup object
     
-    name : str
+    name : str or None
         The name of the restaurant
     
-    district : str
+    district : str or None
         Restaurant's district
 
-    ratings : float
+    ratings : float or None
         Average ratings of the restaurant
 
-    review_count : int
+    review_count : int or None
         Number of reviews
 
     opening_hours : dict or None
@@ -161,11 +161,15 @@ class Restaurant:
 
         Returns
         -------
-        restaurant_name : str
+        restaurant_name : str or None
             The name of the restaurant
         """
-        restaurant_name=soup.find('h1',{'itemprop':'name'}).text
-        return restaurant_name
+        if soup.find('h1',{'itemprop':'name'}) == None:
+            restaurant_name = None
+            return restaurant_name
+        else:
+            restaurant_name=soup.find('h1',{'itemprop':'name'}).text
+            return restaurant_name
 
     def getDistrict(self,soup):
         """
@@ -178,12 +182,16 @@ class Restaurant:
 
         Returns
         -------
-        district : str
+        district : str or None
             The restaurant's district
         """
-        address=soup.find('span',{'itemprop':'description'}).text
-        district=re.search('Praha [0-9]{1,2}',address).group(0)
-        return district
+        if soup.find('span',{'itemprop':'description'}) == None:
+            district = None
+            return district
+        else:
+            address=soup.find('span',{'itemprop':'description'}).text
+            district=re.search('Praha [0-9]{1,2}',address).group(0)
+            return district
 
     def getRatings(self,soup):
         """
@@ -196,11 +204,15 @@ class Restaurant:
 
         Returns
         -------
-        ratings : float
+        ratings : float or None
             The restaurant's average ratings
         """
-        ratings=soup.find('span',{'itemprop':'ratingValue'}).text
-        return float(ratings)
+        if soup.find('span',{'itemprop':'ratingValue'}) == None:
+            ratings = None
+            return ratings
+        else:
+            ratings=soup.find('span',{'itemprop':'ratingValue'}).text
+            return float(ratings)
 
     def getReviewCount(self,soup):
         """
@@ -213,11 +225,15 @@ class Restaurant:
 
         Returns
         -------
-        review_count : int
+        review_count : int or None
             The number of reviews
         """
-        review_count=soup.find('span',{'itemprop':'reviewCount'}).text
-        return int(review_count)
+        if soup.find('span',{'itemprop':'reviewCount'}) == None:
+            review_count = None
+            return review_count
+        else:
+            review_count=soup.find('span',{'itemprop':'reviewCount'}).text
+            return int(review_count)
 
     def getOpeningHours(self,soup):
         """
