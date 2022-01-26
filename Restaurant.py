@@ -258,6 +258,8 @@ class Restaurant:
             for i in table:
                 if re.match('Dnes|\n',i.text):
                     pass
+                elif i.text == 'zavřeno':
+                    table_text.append(None)
                 else:
                     table_text.append(i.text)
             dict={}
@@ -271,23 +273,26 @@ class Restaurant:
 
         Parameters
         ----------
-        time_range : str
+        time_range : str or None
             A time range as a string
 
         Returns
         -------
-        number : float
+        number : float or None
             A number representing the time span of the given time range
         """
-        hours=[time_range.split()[i] for i in [0,2]] #splitting by space and disregarding "-"
-        start_end=[] #empty list for converted starting and ending values
-        for i in hours:
-            if re.search(':',i): #if the string is not a whole hour, convert it
-                splits=i.split(':')
-                start_end.append(float(splits[0])+float(splits[1])/60)
-            else:
-                start_end.append(float(i))
-        return round(start_end[1] - start_end[0],2)
+        if time_range == None:
+            return None
+        else:
+            hours=[time_range.split()[i] for i in [0,2]] #splitting by space and disregarding "-"
+            start_end=[] #empty list for converted starting and ending values
+            for i in hours:
+                if re.search(':',i): #if the string is not a whole hour, convert it
+                    splits=i.split(':')
+                    start_end.append(float(splits[0])+float(splits[1])/60)
+                else:
+                    start_end.append(float(i))
+            return round(start_end[1] - start_end[0],2)
 
     def openingHoursToSpan(self,opening_hours):
         """
