@@ -27,10 +27,10 @@ class Restaurant:
     review_count : int
         Number of reviews
 
-    opening_hours : dict
+    opening_hours : dict or None
         Opening hours on each day of the week
 
-    opening_hours_span : dict
+    opening_hours_span : dict or None
         The total opening time for each day of the week
 
     email_address : str or None
@@ -45,13 +45,13 @@ class Restaurant:
     payment_methods : list or None
             List of available payment methods
 
-    products : list or none
+    products : list or None
             List of available products
 
-    services : list or none
+    services : list or None
             List of available services
 
-    marks : list or none
+    marks : list or None
             List of available marks
 
     coordinates : dict or None
@@ -230,20 +230,24 @@ class Restaurant:
 
         Returns
         -------
-        dict : dict
+        dict : dict or None
             A dictionary containing the opening hours for each day of the week
         """
-        table=soup.find('table',{'class':'table table-condensed'}).find_all('td')
-        table_text=[]
-        for i in table:
-            if re.match('Dnes|\n',i.text):
-                pass
-            else:
-                table_text.append(i.text)
-        dict={}
-        for i in range(0,len(table_text),2):
-            dict[table_text[i]]=table_text[i+1]
-        return dict
+        if soup.find('table',{'class':'table table-condensed'}) == None:
+            dict = None
+            return dict
+        else:
+            table=soup.find('table',{'class':'table table-condensed'}).find_all('td')
+            table_text=[]
+            for i in table:
+                if re.match('Dnes|\n',i.text):
+                    pass
+                else:
+                    table_text.append(i.text)
+            dict={}
+            for i in range(0,len(table_text),2):
+                dict[table_text[i]]=table_text[i+1]
+            return dict
 
     def rangeToNumber(self,time_range):
         """
@@ -275,16 +279,20 @@ class Restaurant:
 
         Parameters
         ----------
-        opening_hours : dict
+        opening_hours : dict or None
             Opening hours for each week day as a dictionary
 
         Returns
         -------
-        span_dict : dictionary
+        span_dict : dict or None
             A dictionary of time spans
         """
-        span_dict={key:self.rangeToNumber(value) for (key,value) in opening_hours.items()}
-        return span_dict
+        if opening_hours == None:
+            span_dict = None
+            return span_dict
+        else:
+            span_dict={key:self.rangeToNumber(value) for (key,value) in opening_hours.items()}
+            return span_dict
 
     def getEmail(self,soup):
         """
