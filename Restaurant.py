@@ -252,6 +252,9 @@ class Restaurant:
         if soup.find('table',{'class':'table table-condensed'}) == None:
             dict = None
             return dict
+        elif self.name == 'Restaurace HOOTERS Vodičkova': #this elif is only contemporary solution..to be removed
+            dict = {'Po': '11 - 23', 'Út': '11 - 23', 'St': '11 - 23', 'Čt': '11 - 01', 'Pá': '11 - 01', 'So': '11 - 01', 'Ne': '11 - 23'}
+            return dict
         else:
             table=soup.find('table',{'class':'table table-condensed'}).find_all('td')
             table_text=[]
