@@ -252,9 +252,9 @@ class Restaurant:
         if soup.find('table',{'class':'table table-condensed'}) == None:
             dict = None
             return dict
-        elif self.name == 'Restaurace HOOTERS Vodičkova': #this elif is only temporary solution..to be removed
-            dict = {'Po': '11 - 23', 'Út': '11 - 23', 'St': '11 - 23', 'Čt': '11 - 01', 'Pá': '11 - 01', 'So': '11 - 01', 'Ne': '11 - 23'}
-            return dict
+        #elif self.name == 'Restaurace HOOTERS Vodičkova': #this elif is only temporary solution..to be removed
+        #    dict = {'Po': '11 - 23', 'Út': '11 - 23', 'St': '11 - 23', 'Čt': '11 - 01', 'Pá': '11 - 01', 'So': '11 - 01', 'Ne': '11 - 23'}
+        #    return dict
         else:
             table=soup.find('table',{'class':'table table-condensed'}).find_all('td')
             table_text=[]
@@ -265,9 +265,30 @@ class Restaurant:
                     table_text.append(None)
                 else:
                     table_text.append(i.text)
-            dict={}
-            for i in range(0,len(table_text),2):
-                dict[table_text[i]]=table_text[i+1]
+            #dict={}             #these 4 lines to be removed
+            #for i in range(0,len(table_text),2):
+            #    dict[table_text[i]]=table_text[i+1]
+            #return dict
+
+            week_days = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne']
+            dict = {'Po':None, 'Út':None, 'St':None, 'Čt':None, 'Pá':None, 'So':None, 'Ne':None}
+            for i in table_text:
+                if i in week_days:
+                    if table_text.index(i)+3 < len(table_text):
+                        if table_text[table_text.index(i)+2] in week_days:
+                            dict[i]=table_text[table_text.index(i)+1]
+                        elif table_text[table_text.index(i)+3] in week_days:
+                            dict[i]=[table_text[table_text.index(i)+1], table_text[table_text.index(i)+2]]
+                        else:
+                            raise IndexError('Unexpected number of cells in the Opening hours table :(')
+                    else:
+                        if len(table_text)-table_text.index(i) == 2:
+                            dict[i]=table_text[table_text.index(i)+1]
+                        elif len(table_text)-table_text.index(i) == 3:
+                            dict[i]=[table_text[table_text.index(i)+1], table_text[table_text.index(i)+2]]
+                else:
+                    pass
+
             return dict
 
     def rangeToNumber(self,time_range):
@@ -315,8 +336,28 @@ class Restaurant:
             span_dict = None
             return span_dict
         else:
-            span_dict={key:self.rangeToNumber(value) for (key,value) in opening_hours.items()}
-            return span_dict
+            span_dict = {'Po':None, 'Út':None, 'St':None, 'Čt':None, 'Pá':None, 'So':None, 'Ne':None}
+            week_days = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne']
+            for i in week_days:
+                if opening_hours[i] == None:
+                    span_dict[i] = None
+                elif type(opening_hours[i]) == list:
+                    multiple_spans = []
+                    for n in opening_hours[i]:
+                        multiple_spans.append(self.rangeToNumber(n))
+                    
+                    span_dict[i] = sum(multiple_spans) 
+                else:    
+                    span_dict[i]=self.rangeToNumber(opening_hours[i])
+
+            return(span_dict)        
+
+        #if opening_hours == None:
+        #    span_dict = None
+        #    return span_dict
+        #else:
+        #    span_dict={key:self.rangeToNumber(value) for (key,value) in opening_hours.items()}
+        #    return span_dict
 
     def getEmail(self,soup):
         """
