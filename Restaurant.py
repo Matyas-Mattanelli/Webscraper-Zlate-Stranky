@@ -190,7 +190,7 @@ class Restaurant:
             return district
         else:
             address=soup.find('span',{'itemprop':'description'}).text
-            district=re.search('Praha [0-9]{1,2}',address).group(0)
+            district=re.search('Praha[ ]{0,1}[0-9]{0,2}',address).group(0)
             return district
 
     def getRatings(self,soup):
