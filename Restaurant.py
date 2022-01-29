@@ -1,3 +1,4 @@
+from audioop import add
 from tkinter.messagebox import NO
 import requests
 from bs4 import BeautifulSoup
@@ -17,6 +18,9 @@ class Restaurant:
     
     name : str or None
         The name of the restaurant
+
+    address : str or None
+        The address of the restaurant
     
     district : str or None
         Restaurant's district
@@ -64,6 +68,9 @@ class Restaurant:
     
     getName(soup):
         A function to retrieve the name of the restaurant
+
+    getAdress(soup)
+        A function to retrieve the address of the restaurant
 
     getDirstrict(soup)
         A function to retrive the restaurant's district
@@ -115,6 +122,7 @@ class Restaurant:
         """
         self.soup=self.getSoup(link)
         self.name=self.getName(self.soup)
+        self.address=self.getAddress(self.soup)
         self.district=self.getDistrict(self.soup)
         self.ratings=self.getRatings(self.soup)
         self.review_count=self.getReviewCount(self.soup)
@@ -170,6 +178,28 @@ class Restaurant:
         else:
             restaurant_name=soup.find('h1',{'itemprop':'name'}).text
             return restaurant_name
+
+    def getAddress(self,soup):
+        """
+        A function to retrieve the address of the restaurant
+
+        Parameters
+        ----------
+        soup : A Beautiful Soup object
+            A Beatiful Soup object created from the request sent to the restaurants page
+
+        Returns
+        -------
+        address : str or None
+            The addres of the restaurant
+        """
+        if soup.find('span',{'itemprop':'description'}) == None:
+            address = None
+            return address
+        else:
+            address_full=soup.find('span',{'itemprop':'description'}).text
+            address = re.search('.+?(?=okres)',address_full).group(0)
+            return address
 
     def getDistrict(self,soup):
         """
