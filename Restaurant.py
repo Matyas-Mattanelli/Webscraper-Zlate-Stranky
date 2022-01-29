@@ -263,6 +263,8 @@ class Restaurant:
                     pass
                 elif i.text == 'zavřeno':
                     table_text.append(None)
+                elif i.text == 'nonstop':
+                    table_text.append('0 - 24')
                 else:
                     table_text.append(i.text)
             #dict={}             #these 4 lines to be removed
