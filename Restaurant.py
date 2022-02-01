@@ -207,8 +207,8 @@ class Restaurant:
             address = None
             return address
         else:
-            address_full=soup.find('span',{'itemprop':'description'}).text
-            address = re.search('.+?(?=okres)',address_full).group(0)
+            address=soup.find('span',{'itemprop':'description'}).text
+            #address = re.search('.+?(?=okres)',address_full).group(0) removed for now since it does not play well with getDistrict
             return address
 
     def getMappingDictionary(self):
