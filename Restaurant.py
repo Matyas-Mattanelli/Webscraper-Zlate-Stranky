@@ -78,10 +78,13 @@ class Restaurant:
     getMappingDictionary():
         A function to load the prepared dictionary with municipal districts as keys and their respective administrative districts and cadastral areas as values
 
-    mappingDistrict(address_part):
-        A function to map administrative districts or cadastral areas to their municipal district
+    mappingDistrict(address):
+        A function to map administrative districts or cadastral areas to their municipal district based on a whole address
+    
+    getDistrictFromPraha_XX(praha_xx)
+        A function to map administrative district or municipal district to municipal district
 
-    getDirstrict(soup)
+    getDistrict(address)
         A function to retrive the restaurant's district
     
     getRatings(soup)
@@ -183,11 +186,10 @@ class Restaurant:
             The name of the restaurant
         """
         if soup.find('h1',{'itemprop':'name'}) == None:
-            restaurant_name = None
-            return restaurant_name
+            restaurant_name = None   
         else:
             restaurant_name=soup.find('h1',{'itemprop':'name'}).text
-            return restaurant_name
+        return restaurant_name
 
     def getAddress(self,soup):
         """
@@ -205,11 +207,10 @@ class Restaurant:
         """
         if soup.find('span',{'itemprop':'description'}) == None:
             address = None
-            return address
         else:
             address_full=soup.find('span',{'itemprop':'description'}).text
             address = re.search('.+?(?=okres)',address_full).group(0)
-            return address
+        return address
 
     def getMappingDictionary(self):
         """
@@ -227,56 +228,56 @@ class Restaurant:
             dist_dict = json.load(json_file)
         return dist_dict
 
-    def mappingDistrict(self, address_part):
+    def mappingDistrict(self, address):
         """
-        A function to map administrative districts or cadastral areas to their municipal district
+        A function to map administrative districts or cadastral areas to their municipal district based on a whole address
 
         Parameters
         ----------
-        address_part: list or str
-            A list or a string containg single words from an address string
+        address: str
+            A string containing the address
 
         Returns
         -------
-        dist_dict : dict
-            Mapping dictionary for districts
+        district : str
+            District based on the given address
         """
-        if type(address_part)==type(''): #If it is a single string, we need to convert it into a list to avoid iterating characters
-            address_part=[address_part]
-        for key in self.dist_dict.keys():
-            for dist_dict_value in self.dist_dict[key]:
-                for value in address_part:
-                    if value in dist_dict_value:
-                        district=key
-                        indic=True
-                        break
-                    else:
-                        indic=False
-                        continue
-                if indic==True:
+        indic=False
+        for key in self.dist_dict: #For each munipal district
+            for value in self.dist_dict[key]: #Take each administartive district/cadastral area a look for them in the address string
+                if value in address: #If found, save it and break the loop
+                    district=key
+                    indic=True #Tool to break the outside loop as well
                     break
-                else:
-                    continue
-            if indic==True:
+            if indic: #break the outside loop if the district has been found
                 break
-            else:
-                continue
         try:
             return district
-        except UnboundLocalError: #In the very special case the district is not found, return Praha
-            return 'Praha'
+        except UnboundLocalError: #In case the district is not found, return Not found
+            return 'Not found'
 
-    def cleanWords(self,words):
-        clean_words=[]
-        for word in words:
-            try:
-                int(word) #if it is an integer, we do not want it
-            except ValueError:
-                if (len(word)>=4) & (word!='Praha'): #We do not want short words and Praha
-                    clean_words.append(word)
-                else:
-                    pass
-        return clean_words
+    def getDistrictFromPraha_XX(self, praha_xx):
+        """
+        A function to map administrative district or municipal district to municipal district
+
+        Parameters
+        ----------
+        praha_xx: str
+            A string containing the municipal/administartive district in format Praha XX
+
+        Returns
+        -------
+        district : str
+            Municipal district derived from the input
+        """
+        if praha_xx in self.dist_dict.keys(): #In case the municipal district (Praha 1-10) was already extracted, return it
+            district=praha_xx
+        else: #If not, search through the mapping dictionary
+            for key in self.dist_dict:
+                if praha_xx in self.dist_dict[key]:
+                    district=key
+                    break
+        return district
 
     def getDistrict(self,address):
         """
@@ -290,22 +291,20 @@ class Restaurant:
         Returns
         -------
         district : str or None
-            The restaurant's district
+            The restaurant's municipal district
         """
-        if self.address == None:
+        if address == None:
             district = None
-            return district
         else:
             search_dist=re.search('Praha [0-9]{1,2}',address) #Firstly, try to find a Praha xx
             if search_dist: #If found, map it to the municipal district
                 if search_dist.group(0)=='Praha 31': #Very special case of one restaurant with Praha 310 in the beginning of the address => resolved by brute force
                     district='Praha 1'
                 else:
-                    district=self.mappingDistrict(search_dist.group(0))
-            else: #If not found, split the address into words and try to map it using the district dictionary
-                words=re.split('\W+',address)
-                district=self.mappingDistrict(self.cleanWords(words))
-            return district
+                    district=self.getDistrictFromPraha_XX(search_dist.group(0)) #Find district based on Praha XX
+            else: #If not found, feed the whole address to the mapping function
+                district=self.mappingDistrict(address)
+        return district
             #value=re.search('Praha[ ]{0,1}[0-9]{0,2}',address).group(0).strip()
             #if value=='Praha':
                 #words=re.split('\W+',address)
@@ -332,10 +331,9 @@ class Restaurant:
         """
         if soup.find('span',{'itemprop':'ratingValue'}) == None:
             ratings = None
-            return ratings
         else:
-            ratings=soup.find('span',{'itemprop':'ratingValue'}).text
-            return float(ratings)
+            ratings=float(soup.find('span',{'itemprop':'ratingValue'}).text)
+        return ratings
 
     def getReviewCount(self,soup):
         """
@@ -353,10 +351,9 @@ class Restaurant:
         """
         if soup.find('span',{'itemprop':'reviewCount'}) == None:
             review_count = None
-            return review_count
         else:
-            review_count=soup.find('span',{'itemprop':'reviewCount'}).text
-            return int(review_count)
+            review_count=int(soup.find('span',{'itemprop':'reviewCount'}).text)
+        return review_count
 
     def getOpeningHours(self,soup):
         """
@@ -374,7 +371,6 @@ class Restaurant:
         """
         if soup.find('table',{'class':'table table-condensed'}) == None:
             dict = None
-            return dict
         #elif self.name == 'Restaurace HOOTERS Vodičkova': #this elif is only temporary solution..to be removed
         #    dict = {'Po': '11 - 23', 'Út': '11 - 23', 'St': '11 - 23', 'Čt': '11 - 01', 'Pá': '11 - 01', 'So': '11 - 01', 'Ne': '11 - 23'}
         #    return dict
@@ -414,7 +410,7 @@ class Restaurant:
                 else:
                     pass
 
-            return dict
+        return dict
 
     def rangeToNumber(self,time_range):
         """
@@ -427,11 +423,11 @@ class Restaurant:
 
         Returns
         -------
-        number : float or None
+        span : float or None
             A number representing the time span of the given time range
         """
         if time_range == None:
-            return None
+            span=None
         else:
             hours=[time_range.split()[i] for i in [0,2]] #splitting by space and disregarding "-"
             start_end=[] #empty list for converted starting and ending values
@@ -441,7 +437,8 @@ class Restaurant:
                     start_end.append(float(splits[0])+float(splits[1])/60)
                 else:
                     start_end.append(float(i))
-            return round(start_end[1] - start_end[0],2)
+            span=round(start_end[1] - start_end[0],2)
+        return span
 
     def openingHoursToSpan(self,opening_hours):
         """
@@ -459,7 +456,6 @@ class Restaurant:
         """
         if opening_hours == None:
             span_dict = None
-            return span_dict
         else:
             span_dict = {'Po':None, 'Út':None, 'St':None, 'Čt':None, 'Pá':None, 'So':None, 'Ne':None}
             week_days = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne']
@@ -475,7 +471,7 @@ class Restaurant:
                 else:    
                     span_dict[i]=self.rangeToNumber(opening_hours[i])
 
-            return(span_dict)        
+        return span_dict        
 
         #if opening_hours == None:
         #    span_dict = None
@@ -500,10 +496,9 @@ class Restaurant:
         """
         if soup.find('a', {'data-ta':'EmailClick'}) == None:
             email_address=None
-            return email_address
         else:
             email_address=soup.find('a', {'data-ta':'EmailClick'}).text
-            return email_address
+        return email_address
 
 
     def getPhone(self,soup):
@@ -522,7 +517,6 @@ class Restaurant:
         """
         if soup.find('td', {'itemprop':'telephone'}) == None:
             phones = None
-            return phones
         else:
             telephone_numbers = []
             telephone_names = []
@@ -537,8 +531,7 @@ class Restaurant:
                 telephone_names.append(soup.find('td', text=i).find_next_sibling('td').text)
 
             phones = {telephone_names[i]: telephone_numbers[i] for i in range(len(telephone_numbers))}
-
-            return phones
+        return phones
 
     def getWebPage(self,soup):
         '''
@@ -556,10 +549,9 @@ class Restaurant:
         '''
         if soup.find('a', {'data-ta':'LinkClick'}) == None:
             web_page = None
-            return web_page
         else:
             web_page = soup.find('a', {'data-ta':'LinkClick'})['href']
-            return web_page
+        return web_page
 
     def getPaymentMethods(self,soup):
         '''
@@ -577,15 +569,13 @@ class Restaurant:
         '''
         if soup.find('h2', text='Platební metody') == None:
             payment_methods = None
-            return payment_methods
         else:
             payment_methods_raw = soup.find('h2', text='Platební metody').find_next_sibling('ul', {'class':'list-inline'}).find_all('li') #finding list of payment methods (wraped in <li><\li>)
             payment_methods = [] #empty list to be used in the next for loop
 
             for i in payment_methods_raw: #unwraping the <li>
                 payment_methods.append(i.text)
-
-            return payment_methods #list containing strings, representing individual payment methods
+        return payment_methods #list containing strings, representing individual payment methods
 
     def getServicesMarksProducts(self,soup):
         '''
@@ -608,9 +598,8 @@ class Restaurant:
             ServicesMarksProducts = []
 
             for i in ServicesMarksProducts_raw:
-                ServicesMarksProducts.append(i.text)
-            
-            return ServicesMarksProducts
+                ServicesMarksProducts.append(i.text)   
+        return ServicesMarksProducts
 
 
     def getServicesSeparator(self, category):
@@ -630,7 +619,6 @@ class Restaurant:
         ServicesMarksProducts = self.getServicesMarksProducts(self.soup)
         if ServicesMarksProducts == None:
              items = None
-             return items
         else:
             try:
                 ##defining the helper list of positions of categories
@@ -651,10 +639,7 @@ class Restaurant:
             
             except ValueError: #In case that retaurant does not have given category specified, None will return
                 items = None
-                return items
-
-            else: #when the category is specified, the items will return
-                return(items)
+        return items
 
     def getCoordinates(self,soup):
         '''
@@ -673,9 +658,8 @@ class Restaurant:
         div_coordinates=soup.find('div',{'class':'map'})
         if div_coordinates == None:
             coordinates = None
-            return coordinates
         else: 
             coordinates={}
             coordinates['latitude']=json.loads(div_coordinates['data-centerpoi'])['lat']
             coordinates['longitude']=json.loads(div_coordinates['data-centerpoi'])['lng']
-            return coordinates
+        return coordinates
