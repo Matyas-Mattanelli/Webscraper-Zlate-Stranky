@@ -207,8 +207,8 @@ class Restaurant:
             address = None
             return address
         else:
-            address=soup.find('span',{'itemprop':'description'}).text
-            #address = re.search('.+?(?=okres)',address_full).group(0) removed for now since it does not play well with getDistrict
+            address_full=soup.find('span',{'itemprop':'description'}).text
+            address = re.search('.+?(?=okres)',address_full).group(0)
             return address
 
     def getMappingDictionary(self):
@@ -244,16 +244,39 @@ class Restaurant:
         if type(address_part)==type(''): #If it is a single string, we need to convert it into a list to avoid iterating characters
             address_part=[address_part]
         for key in self.dist_dict.keys():
-            for value in address_part:
-                if value in self.dist_dict[key]:
-                    district=key
+            for dist_dict_value in self.dist_dict[key]:
+                for value in address_part:
+                    if value in dist_dict_value:
+                        district=key
+                        indic=True
+                        break
+                    else:
+                        indic=False
+                        continue
+                if indic==True:
                     break
                 else:
-                    pass
+                    continue
+            if indic==True:
+                break
+            else:
+                continue
         try:
             return district
         except UnboundLocalError: #In the very special case the district is not found, return Praha
             return 'Praha'
+
+    def cleanWords(self,words):
+        clean_words=[]
+        for word in words:
+            try:
+                int(word) #if it is an integer, we do not want it
+            except ValueError:
+                if (len(word)>=4) & (word!='Praha'): #We do not want short words and Praha
+                    clean_words.append(word)
+                else:
+                    pass
+        return clean_words
 
     def getDistrict(self,address):
         """
@@ -273,15 +296,25 @@ class Restaurant:
             district = None
             return district
         else:
-            value=re.search('Praha[ ]{0,1}[0-9]{0,2}',address).group(0).strip()
-            if value=='Praha':
+            search_dist=re.search('Praha [0-9]{1,2}',address) #Firstly, try to find a Praha xx
+            if search_dist: #If found, map it to the municipal district
+                if search_dist.group(0)=='Praha 31': #Very special case of one restaurant with Praha 310 in the beginning of the address => resolved by brute force
+                    district='Praha 1'
+                else:
+                    district=self.mappingDistrict(search_dist.group(0))
+            else: #If not found, split the address into words and try to map it using the district dictionary
                 words=re.split('\W+',address)
-                district=self.mappingDistrict(words)
-            elif value=='Praha 31': #For a very special case of one of the Starbucks, had to be resolved by brute force
-                district='Praha 1'
-            else:
-                district=self.mappingDistrict(value)
+                district=self.mappingDistrict(self.cleanWords(words))
             return district
+            #value=re.search('Praha[ ]{0,1}[0-9]{0,2}',address).group(0).strip()
+            #if value=='Praha':
+                #words=re.split('\W+',address)
+                #district=self.mappingDistrict(words)
+            #elif value=='Praha 31': #For a very special case of one of the Starbucks, had to be resolved by brute force
+                #district='Praha 1'
+            #else:
+                #district=self.mappingDistrict(value)
+            #return district
 
     def getRatings(self,soup):
         """

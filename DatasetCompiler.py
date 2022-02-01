@@ -94,7 +94,9 @@ class DatasetCompiler:
         df : pd.DataFrame
             Data set compiled from the list of Restaurant objects
         """
-        attributes=list(list_of_restaurants[0].__dict__.keys())[1:] #Attributes are the same accross instances => need to get them only once. We disregard the first one (soup) since we do not need it in the data set
+        attributes=list(list_of_restaurants[0].__dict__.keys()) #Attributes are the same accross instances => need to get them only once.
+        attributes.remove('soup')
+        attributes.remove('dist_dict')  #We disregard soup and dist_dict since we do not need them in the data set
         restaurants_list_of_dicts=[] #Making a list of dictionaries to be able to transform it into a pd.DataFrame 
         for restaurant in list_of_restaurants:
             restaurant_dict={} #Dictionary for each restaurant
