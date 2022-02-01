@@ -22,6 +22,9 @@ class Restaurant:
     address : str or None
         The address of the restaurant
     
+    dist_dict : dict
+        Mapping dictionary for districts
+
     district : str or None
         Restaurant's district
 
@@ -71,6 +74,12 @@ class Restaurant:
 
     getAdress(soup)
         A function to retrieve the address of the restaurant
+
+    getMappingDictionary():
+        A function to load the prepared dictionary with municipal districts as keys and their respective administrative districts and cadastral areas as values
+
+    mappingDistrict(address_part):
+        A function to map administrative districts or cadastral areas to their municipal district
 
     getDirstrict(soup)
         A function to retrive the restaurant's district
@@ -123,7 +132,8 @@ class Restaurant:
         self.soup=self.getSoup(link)
         self.name=self.getName(self.soup)
         self.address=self.getAddress(self.soup)
-        self.district=self.getDistrict(self.soup)
+        self.dist_dict=self.getMappingDictionary()
+        self.district=self.getDistrict(self.address)
         self.ratings=self.getRatings(self.soup)
         self.review_count=self.getReviewCount(self.soup)
         self.opening_hours=self.getOpeningHours(self.soup)
@@ -201,26 +211,76 @@ class Restaurant:
             address = re.search('.+?(?=okres)',address_full).group(0)
             return address
 
-    def getDistrict(self,soup):
+    def getMappingDictionary(self):
+        """
+        A function to load the prepared dictionary with municipal districts as keys and their respective administrative districts and cadastral areas as values
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        dist_dict : dict
+            Mapping dictionary for districts
+        """
+        with open('dist_dict.json') as json_file:
+            dist_dict = json.load(json_file)
+        return dist_dict
+
+    def mappingDistrict(self, address_part):
+        """
+        A function to map administrative districts or cadastral areas to their municipal district
+
+        Parameters
+        ----------
+        address_part: list or str
+            A list or a string containg single words from an address string
+
+        Returns
+        -------
+        dist_dict : dict
+            Mapping dictionary for districts
+        """
+        if type(address_part)==type(''): #If it is a single string, we need to convert it into a list to avoid iterating characters
+            address_part=[address_part]
+        for key in self.dist_dict.keys():
+            for value in address_part:
+                if value in self.dist_dict[key]:
+                    district=key
+                    break
+                else:
+                    pass
+        try:
+            return district
+        except UnboundLocalError: #In the very special case the district is not found, return Praha
+            return 'Praha'
+
+    def getDistrict(self,address):
         """
         A function to retrive the restaurant's district
 
         Parameters
         ----------
-        soup : A Beautiful Soup object
-            A Beatiful Soup object created from the request sent to the restaurants page
+        address : str
+            Restaurant's address
 
         Returns
         -------
         district : str or None
             The restaurant's district
         """
-        if soup.find('span',{'itemprop':'description'}) == None:
+        if self.address == None:
             district = None
             return district
         else:
-            address=soup.find('span',{'itemprop':'description'}).text
-            district=re.search('Praha[ ]{0,1}[0-9]{0,2}',address).group(0)
+            value=re.search('Praha[ ]{0,1}[0-9]{0,2}',address).group(0).strip()
+            if value=='Praha':
+                words=re.split('\W+',address)
+                district=self.mappingDistrict(words)
+            elif value=='Praha 31': #For a very special case of one of the Starbucks, had to be resolved by brute force
+                district='Praha 1'
+            else:
+                district=self.mappingDistrict(value)
             return district
 
     def getRatings(self,soup):
