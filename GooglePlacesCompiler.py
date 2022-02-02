@@ -30,6 +30,8 @@ class GooglePlacesCompiler:
     getDataFrame(list_of_results)
         A function that concerts list of results into Pandas DataFrame.
 
+    dumpToCSV(file_name='restaurants_Places_API.csv'):
+        A function to export the compiled data set to a csv file named "file_name".
     """
     def __init__(self, restaurants_dataframe, API_KEY):
         """
@@ -180,3 +182,18 @@ class GooglePlacesCompiler:
         """
         places_API_df = pd.DataFrame(list_of_results)
         return places_API_df
+
+    def dumpToCSV(self,file_name='restaurants_Places_API.csv'):
+        """
+        A function to export the compiled data set to a csv file named file_name
+
+        Parameters
+        ----------
+        file_name : str
+            Desired name of the exported csv file. Defaults to "restaurants_Places_API.csv"
+
+        Returns
+        -------
+
+        """
+        self.places_API_df.to_csv(file_name)
