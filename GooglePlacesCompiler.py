@@ -1,6 +1,5 @@
 import requests
 import json
-import pickle #not needed(?)
 import pandas as pd
 import ast
 
@@ -18,6 +17,7 @@ class GooglePlacesCompiler:
         List containing the results of Places API query. Each member of a list is a dict.
 
     places_API_df : pd.DataFrame
+        Dataframe containgn information on the restaurants
 
     Methods
     -------
@@ -48,13 +48,31 @@ class GooglePlacesCompiler:
 
     def find_first_candidate(name, phone, coordinates, API_KEY):
         '''
-        This function will:
-        1) take dictionary of phones of restaurant and takes the first one and dict of coordinates and saves them
+        A function that takes information about a restaurant, makes a query to Google Places API and reurns thus obtained data in a dictionary.
+        The steps are as follows:
+        1) take dictionary of phones of restaurant and extract the first one, as well as coordinates, and saves them
         2) uses Find place to get first candidates ID
         3) use this ID to get Details
         4) return details as a dictionary 
-        
-        The function expects argument phone to be in form {'hlavní telefon': '+420 222 311 221', ...}
+
+        Parameters
+        ----------
+        name : str
+            Name of restaurant
+
+        phone : dict
+            Dictionary of phone numbers
+
+        coordinates : dict
+            Dictionary of coordinates
+
+        API_KEY : str
+            Valid API_KEY generated on Google Cloud Platform (see __init__ for more info)                   
+
+        Returns
+        -------
+        result : dict
+            Dictionary containing name from zlatestranky.cz and information retrieved from Google Places API
         '''
         phone_list = []
         for i in phone:
@@ -115,7 +133,20 @@ class GooglePlacesCompiler:
 
     def getListOfResults(self, restaurants_dataframe, API_KEY):
         """
-        
+        A function that applies find_first_candidate on each row of given dataset. The exception for the restaurant named "Céleste" was made, as it is an outlier with no information
+
+        Parameters
+        ----------
+        restaurants_dataframe : pd.DataFrame
+            Dataframe of restaurants scraped from zlatestranky.cz, produced by DatasetCompiler.py.
+
+        API_KEY : str
+            Valid API_KEY generated on Google Cloud Platform (see __init__ for more info)                   
+
+        Returns
+        -------
+        list_of_results : list
+            List containing the results of Places API query. Each member of a list is a dict.
         """
         zs_restaurants = restaurants_dataframe
         list_of_results = []
@@ -128,14 +159,14 @@ class GooglePlacesCompiler:
                 iter_phones = ast.literal_eval(zs_restaurants["phones"][ind])
                 iter_coordinates = ast.literal_eval(zs_restaurants["coordinates"][ind])
 
-                iter_result = find_first_candidate(iter_name, iter_phones, iter_coordinates, API_KEY)
+                iter_result = self.find_first_candidate(iter_name, iter_phones, iter_coordinates, API_KEY)
 
                 list_of_results.append(iter_result)
         return list_of_results
 
     def getDataFrame(self, list_of_results):
         """
-        A function that concerts list of results into Pandas DataFrame.
+        A function that converts list of results into Pandas DataFrame.
 
         Parameters
         ----------
@@ -145,7 +176,7 @@ class GooglePlacesCompiler:
         Returns
         -------
         places_API_df : pd.DataFrame
-            Data set containgn information on the restaurants
+            Dataframe containgn information on the restaurants
         """
         places_API_df = pd.DataFrame(list_of_results)
         return places_API_df
