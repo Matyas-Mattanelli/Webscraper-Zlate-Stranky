@@ -46,7 +46,7 @@ class GooglePlacesCompiler:
         self.list_of_results = self.getListOfResults(restaurants_dataframe, API_KEY)
         self.places_API_df = self.getDataFrame(self.list_of_results)
 
-    def find_first_candidate(name, phone, coordinates, API_KEY):
+    def find_first_candidate(self, name, phone, coordinates, API_KEY):
         '''
         A function that takes information about a restaurant, makes a query to Google Places API and reurns thus obtained data in a dictionary.
         The steps are as follows:
