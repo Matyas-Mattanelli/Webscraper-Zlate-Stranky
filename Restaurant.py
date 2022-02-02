@@ -79,7 +79,7 @@ class Restaurant:
         A function to load the prepared dictionary with municipal districts as keys and their respective administrative districts and cadastral areas as values
 
     mappingDistrict(address):
-        A function to map administrative districts or cadastral areas to their municipal district based on a whole address
+        A function to map administrative districts or cadastral areas to their municipal district based on a whole address. If the district cannot be mapped, it is derived from the zip code.
     
     getDistrictFromPraha_XX(praha_xx)
         A function to map administrative district or municipal district to municipal district
@@ -230,7 +230,7 @@ class Restaurant:
 
     def mappingDistrict(self, address):
         """
-        A function to map administrative districts or cadastral areas to their municipal district based on a whole address
+        A function to map administrative districts or cadastral areas to their municipal district based on a whole address. If the district cannot be mapped, it is derived from the zip code.
 
         Parameters
         ----------
@@ -253,8 +253,17 @@ class Restaurant:
                 break
         try:
             return district
-        except UnboundLocalError: #In case the district is not found, return Not found
-            return 'Not found'
+        except UnboundLocalError: #In case the district is still not found (district variable has not been generated), try to get it from the zip code
+            try:
+                zip_code=re.search('[0-9]{3} [0-9]{2}',address).group(0) #Extract the zip code from the address
+                if zip_code[1]=='0': #Special case for Praha 10
+                    value='10'
+                else:
+                    value=zip_code[1]
+                district='Praha '+value
+                return district
+            except AttributeError: #If the zip code is not in the address, return "Not found"
+                return 'Not found'
 
     def getDistrictFromPraha_XX(self, praha_xx):
         """
