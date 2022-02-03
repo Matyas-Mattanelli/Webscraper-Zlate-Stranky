@@ -1,4 +1,4 @@
-from Restaurant import Restaurant
+from tools.Restaurant import Restaurant
 import pandas as pd
 import ast
 
@@ -119,6 +119,7 @@ class DatasetCompiler:
         -------
 
         """
+        file_path=f'data\\{file_name}'
         self.dataset.to_csv(file_name)
 
     def readExistingDataset(self,file_name):
@@ -135,7 +136,8 @@ class DatasetCompiler:
         df : pd.DataFrame
             Data set read from the file named file_name
         """
-        df=pd.read_csv(file_name,index_col=0)
+        file_path=f'data\\{file_name}'
+        df=pd.read_csv(file_path,index_col=0)
         #Dictionaries and lists are read from csv as strings=> we need to convert them back
         for column in ['opening_hours','opening_hours_span','phones','payment_methods','products','services','marks','coordinates']:
             for idx in df.index:

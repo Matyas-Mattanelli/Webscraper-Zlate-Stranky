@@ -108,8 +108,9 @@ class MappingDictionaryGetter:
         Returns
         -------
         """
-        with open('dist_dict.json', 'w') as outfile:
+        with open('data\\dist_dict.json', 'w') as outfile:
             json.dump(self.dist_dict, outfile)
 
-dist_dict=MappingDictionaryGetter() #Generate the dictionary
-dist_dict.saveToJSON() #Export it to a json file
+if __name__ == "__main__": #Run only in case the file is run directly
+    dist_dict=MappingDictionaryGetter() #Generate the dictionary
+    dist_dict.saveToJSON() #Export it to a json file

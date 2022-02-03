@@ -224,7 +224,7 @@ class Restaurant:
         dist_dict : dict
             Mapping dictionary for districts
         """
-        with open('dist_dict.json') as json_file:
+        with open('data\\dist_dict.json') as json_file:
             dist_dict = json.load(json_file)
         return dist_dict
 
