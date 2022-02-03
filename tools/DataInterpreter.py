@@ -33,9 +33,6 @@ class DataInterpreter:
     
     email_providers_counts : dict
         A dictionary containingg the number of occurences of restaurants' email providers
-
-    showRows(no_of_rows=1):
-        A function to show a specified number of rows from the top or from the bottom of the data set
         
     Methods
     -------
@@ -74,6 +71,12 @@ class DataInterpreter:
 
     plotEmailProvidersCounts(threshold=10,plot_type='bar'):
         A function to plot the value counts of email providers
+
+    showRows(no_of_rows=1):
+        A function to show a specified number of rows from the top or from the bottom of the data set
+
+    scanThroughDataset(district=None,ratings=None,review_count=None,keyword=None,weekly_opening_duration=None,columns_to_display='all',max_no_of_rows=5):
+        A function to show a part of the data set based on the user's input
     """
     def __init__(self,dataset):
         """
@@ -180,6 +183,7 @@ class DataInterpreter:
             list_of_sums_of_opening_hours_spans.append(value)
         array_of_sums_of_opening_hours_spans=np.array(list_of_sums_of_opening_hours_spans) #Convert to a numpy array for easier handling
         array_of_sums_of_opening_hours_spans[array_of_sums_of_opening_hours_spans==0]=np.nan #If the sum is zero, the restaurant is either closed or the opening hours are not available => we replace it with NaN
+        self.dataset['weekly_opening_duration']=array_of_sums_of_opening_hours_spans #Adds a column to the data set
         return array_of_sums_of_opening_hours_spans
     
     def interpretOpeningHoursDurations(self,plot_hist=True):
@@ -421,5 +425,94 @@ class DataInterpreter:
         else:
             dataset=self.dataset.tail(abs(no_of_rows))
         return dataset
+
+    def scanThroughDataset(self,district=None,ratings=None,review_count=None,keyword=None,weekly_opening_duration=None,columns_to_display='all',max_no_of_rows=5):
+        """
+        A function to show a part of the data set based on the user's input
+
+        Parameters
+        ----------
+        district : str
+            A string specifying the Prague municipal district (Praha 1-10)
+        
+        ratings : int, float or str
+            A number specifying the lower bound for displayed ratings
+
+        review_count : int, float or str
+            A number specifying the lower bound for the number of displayed review counts
+
+        keyword : str
+            A string use to search through categorical data and look for a match
+
+        weekly_opening_duration : int, float or str
+            A number specifying the lower bound for the displayed weekly opening hours duration
+
+        columns_to_display : list or str
+            A string representing a single column or a list of columns to be displayed. Defaults to 'all'
+
+        max_no_of_rows : int or str
+            A number representing the maximum number of rows to be displayed. Defaults to 5
+        
+        Returns
+        -------
+        dataset : pandas.DataFrame
+            A dataset filtered with the user's input
+        """
+        dataset=self.dataset
+        if district:
+            try:
+                dataset=dataset[dataset.district==district]
+            except:
+                raise ValueError('Invalid municipal district')
+        if ratings:
+            try:
+                ratings=float(ratings)
+                dataset=dataset[dataset.ratings>=ratings]
+            except:
+                raise ValueError('Invalid ratings')
+        if review_count:
+            try:
+                review_count=float(review_count)
+                dataset=dataset[dataset.review_count>=review_count]
+            except:
+                raise ValueError('Invalid number of reviews')
+        if keyword:
+            indices=[]
+            for column in ['payment_methods','products','services','marks']:
+                for idx, value in enumerate(dataset[column]):
+                    if type(value)==type([]):
+                        if keyword in value:
+                            indices.append(idx)
+                        else:
+                            pass
+                    elif pd.isna(value):
+                        pass
+                    elif keyword==value:
+                        indices.append(idx)
+                    else:
+                        pass
+            indices=list(set(indices)) #To avoid duplicate indices
+            dataset=dataset.iloc[indices]
+        if weekly_opening_duration:
+            try:
+                weekly_opening_duration=float(weekly_opening_duration)
+                dataset=dataset[dataset.weekly_opening_duration>=weekly_opening_duration]
+            except:
+                raise ValueError('Invalid weekly_opening_duration')
+        if len(dataset)==0:
+            print('No results found for Your input')
+        else:
+            if columns_to_display=='all':
+                pass
+            else:
+                dataset=dataset[columns_to_display]
+            if max_no_of_rows:
+                try:
+                    max_no_of_rows=int(max_no_of_rows)
+                    return dataset.head(max_no_of_rows)
+                except:
+                    raise ValueError('Invalid number of rows specified')
+            else:
+                return dataset
 
 
