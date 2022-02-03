@@ -34,7 +34,7 @@ class DatasetCompiler:
         A function to read an existing data set from a csv file named "file_name". It also converts strings to Python objects.
 
     """
-    def __init__(self,links=None,existing=False,file_name='restaurants_zlatestranky.csv'):
+    def __init__(self,links=None,existing=True,file_name='restaurants_zlatestranky.csv'):
         """
         Constructs all the attributes given the parameters. If existing=False, compiles a new data set. Otherwise, reads an existing one based on file_name
 
@@ -44,7 +44,7 @@ class DatasetCompiler:
             Either a list of links for each restaurant or a string containing a link for a single restaurant
 
         existing : bool
-            A boolean indicating whether an existing data set should be loaded or a new one should be compiled. Defaults to False
+            A boolean indicating whether an existing data set should be loaded or a new one should be compiled. Defaults to True
 
         file_name : str
             Name of the file to read in case existing=True. Defaults to "restaurants_zlatestranky.csv"
@@ -120,7 +120,7 @@ class DatasetCompiler:
 
         """
         file_path=f'data\\{file_name}'
-        self.dataset.to_csv(file_name)
+        self.dataset.to_csv(file_path)
 
     def readExistingDataset(self,file_name):
         """
