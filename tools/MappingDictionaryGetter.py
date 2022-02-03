@@ -1,5 +1,5 @@
 #Running this file generates the dist_dict.json file which is the mapping dictionary for Prague districts 
-#It is needed in Restaurant.py for generating a district based on an address
+#This file is needed in Restaurant.py for generating a district based on an address
 #No need to run it, the file has already been generated (but it is runnable if necessary)
 import requests
 from bs4 import BeautifulSoup

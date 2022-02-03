@@ -1,3 +1,4 @@
+from xmlrpc.client import NOT_WELLFORMED_ERROR
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -31,8 +32,11 @@ class DataInterpreter:
         A dictionary containing the value counts of number of phone numbers available per restaurant
     
     email_providers_counts : dict
-        A dictionary containingg the number of occurences of restaurants' email providers 
+        A dictionary containingg the number of occurences of restaurants' email providers
 
+    showRows(no_of_rows=1):
+        A function to show a specified number of rows from the top or from the bottom of the data set
+        
     Methods
     -------
     removeEmptyObservations(dataset):
@@ -393,5 +397,29 @@ class DataInterpreter:
             plt.legend()
         else:
             raise ValueError('Please specify the plot_type as "bar" or "pie"')
+
+    def showRows(self,no_of_rows=1):
+        """
+        A function to show a specified number of rows from the top or from the bottom of the data set
+
+        Parameters
+        ----------
+        no_of_rows : int or str
+            An integer specifying the number of rows to return. Positive number shows rows from the top, negative from the bottom. Defaults to 1.
+        
+        Returns
+        -------
+        dataset : pandas.DataFrame
+            A dataset with a specified number of rows
+        """
+        try:
+            no_of_rows=int(no_of_rows)
+        except:
+            raise ValueError('Please specify the number of rows as an integer')
+        if no_of_rows>=0:
+            dataset=self.dataset.head(no_of_rows)
+        else:
+            dataset=self.dataset.tail(abs(no_of_rows))
+        return dataset
 
 
