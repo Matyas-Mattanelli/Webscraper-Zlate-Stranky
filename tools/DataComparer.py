@@ -129,11 +129,14 @@ class DataComparer:
         -------
 
         '''
-        df_API_exact_match = self.df_API[self.df_API["exact_match"] == True]
-        df_API_outlier = df_API_exact_match[df_API_exact_match["user_ratings_total"] < outlier]
-        df_API_hist = df_API_outlier["user_ratings_total"]
-        plt.hist(df_API_hist,color='red', bins=12)
-        plt.title('Number of ratings')
+        if type(outlier) == int:
+            df_API_exact_match = self.df_API[self.df_API["exact_match"] == True]
+            df_API_outlier = df_API_exact_match[df_API_exact_match["user_ratings_total"] < outlier]
+            df_API_hist = df_API_outlier["user_ratings_total"]
+            plt.hist(df_API_hist,color='red', bins=12)
+            plt.title('Number of ratings')
+        else:
+            raise ValueError('Invalid input. Please specify outlier as integer')
 
     def plotRatings(self):
         '''

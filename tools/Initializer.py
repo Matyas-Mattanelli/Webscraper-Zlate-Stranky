@@ -27,3 +27,12 @@ def initialize(existing=True):
     else:
         raise ValueError('Invalid input. Please specify existing as True or False')
     return data_interpreter
+
+def initializePlacesAPI(existing=True):
+    if existing == True: 
+        #wip
+
+    elif existing == False:
+        #wip
+    else:
+        raise ValueError('Invalid input. Please specify existing as True or False')
