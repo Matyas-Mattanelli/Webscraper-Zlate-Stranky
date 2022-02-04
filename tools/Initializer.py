@@ -3,7 +3,7 @@ import pandas as pd
 from tools.DatasetCompiler import DatasetCompiler #Either loads an existing data set or generates a new one
 from tools.DataInterpreter import DataInterpreter #Contains methods for interpreting the data set
 
-from tools.GooglePlacesCompiler import GooglePlacesCompiler
+from tools.GooglePlacesCompiler import GooglePlacesCompiler #Loads existing data set from zlatestranky and creates new data set from Places API
 from tools.DataComparer import DataComparer #Contains methods for comparing data from zlatestranky.cz and from Google API
 
 def initialize(existing=True):
