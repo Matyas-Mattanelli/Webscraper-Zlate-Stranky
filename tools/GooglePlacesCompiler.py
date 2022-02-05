@@ -183,7 +183,7 @@ class GooglePlacesCompiler:
         places_API_df = pd.DataFrame(list_of_results)
         return places_API_df
 
-    def dumpToCSV(self,file_name='restaurants_Places_API.csv'):
+    def dumpToCSV(self,file_name='data/restaurants_Places_API.csv'):
         """
         A function to export the compiled data set to a csv file named file_name
 
