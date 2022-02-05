@@ -14,3 +14,8 @@ Jan Kubal & Matyáš Mattanelli
 - The compiled data set is available in the following [file](data/restaurants_zlatestranky.csv).
 
 ![str](Project_structure.png)
+
+---
+### Note on Google Places API
+
+In the selection of variables requested, we were limited by the free billing plan, that Google offers. Despite that, we were able to retrieve information on the number and value of ratings, which might be considered more reliable, than the low amount of ratings on zlatestranky.cz. We decided to match restaurants by their phone number, as it proved to be better than searching by the restaurant's name. Search by name returned more results in total, however, the error rate (not matching the same restaurant correctly) was considerably higher. Also, the name of a restaurant on zlatestranky.cz and on Google Maps is often slightly different, which makes the phone number better matching criterion.
