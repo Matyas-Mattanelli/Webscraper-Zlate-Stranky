@@ -32,6 +32,9 @@ class DataComparer:
 
     printRatingStatistics()
         A function that prints various information about ratings of restaurants retrieved from Places API
+
+    showRows(no_of_rows=1)
+        A function to show a specified number of rows from the top or from the bottom of the data set
     """
 
     def __init__(self, restaurants_zlatestranky, restaurants_Places_API):
@@ -208,5 +211,30 @@ class DataComparer:
         if num_of_highest == 1:
             print("highest rating:", highest_rating, f"({highest_name}, located at {highest_address})")
         else:
-            print("highest rating:", highest_rating, f"({num_of_highest} restaurants)")                       
+            print("highest rating:", highest_rating, f"({num_of_highest} restaurants)")     
+
+
+    def showRows(self,no_of_rows=1):
+        """
+        A function to show a specified number of rows from the top or from the bottom of the data set
+
+        Parameters
+        ----------
+        no_of_rows : int or str
+            An integer specifying the number of rows to return. Positive number shows rows from the top, negative from the bottom. Defaults to 1.
+        
+        Returns
+        -------
+        dataset : pandas.DataFrame
+            A dataset with a specified number of rows
+        """
+        try:
+            no_of_rows=int(no_of_rows)
+        except:
+            raise ValueError('Please specify the number of rows as an integer')
+        if no_of_rows>=0:
+            dataset=self.df_API.head(no_of_rows)
+        else:
+            dataset=self.df_API.tail(abs(no_of_rows))
+        return dataset                                
 
