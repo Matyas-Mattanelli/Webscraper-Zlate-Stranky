@@ -6,44 +6,10 @@ Institute of Economic Studies, Faculty of Social Sciences, Charles University
 
 Jan Kubal & Matyáš Mattanelli
 
-## The purpose of our project
-
-Our project has three main goals:
-
-* To scrape information about restaurants located in Prague from the web page https://www.zlatestranky.cz/, which is an online catalouge of various firms in the Czech Republic.
-
-* To export the data and save it in a python-fiendly format (DataFrame).
-
-* To provide funcionality to the data, which may be missing from zlatestranky.cz. This might include e.g. possibility to list the restaurants according to ratings, filter them by available payment method or check wheather the restaurant is open at a given time.
-
-## Questions for the project discussion
-
-* **Is it better to define class that will return entire dataset or, alteratively class called Restaurant (each individual restaurant will be instance of this class)?**
-
-* Is the sample project provided the benchmark, should we take it as a minimum requirement, or rather as the state-of-the-arts?
-
-* Is it better to call a method right away when initializing a class (i.e. include it in the \_\_init__ constructor) or create an instance first and then call it?
-
-## Master Plan 💪
-
-### What to do until 20.-21.12.
-
-* gather te phone number, email address, website link, payment methods, services(?) (Honza)
-
-* Write license (Honza)
-
-* Start with OOP (Matyáš)
-
-### What to do until Christmas 🎄 + New Year's Eve 🎆🎇
-
-*
-
-### What to do until Deadline ☠
-
-*
-
-## Notes
-
-* Not every restaurant has full information available - this might cause problems while scraping
-* The code might be usable for other districts than just Prague
-* 
+---
+- The main aim of this project is to create a comprehensive data set of Prague restaurants using the information available at [Zlaté Stránky](www.zlatestranky.cz).
+- In addition, it attempts to match each restaurant to its counterpart in the Google database by utilizing the Google Maps Platforms' Places API. Thus, it extends the obtained data set with additional information.
+- Lastly, we provide extensive data interpretation, data visualisation, and an interactive tool to scan through our compiled data set.
+- For the structure of our project, please refer to [Project_structure.pdf](Project_structure.pdf).
+- The final output of our project is available in [output.ipynb](output.ipynb).
+- The compiled data set is available for download in the following [file](data/restaurants_zlatestranky.csv).
