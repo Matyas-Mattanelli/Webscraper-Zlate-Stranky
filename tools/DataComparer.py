@@ -117,7 +117,7 @@ class DataComparer:
         print("Total restaurants found on zlatestranky.cz:", self.df_ZS.name.count())
         print("Restaurants found by Google API search querry for the phone numbers from zlatestranky:", self.df_ZS.exact_match.count())
         print("Out of that, the number of exactly matched phone numbers:", self.df_ZS.exact_match.sum())
-        print("This leaves us with", self.df_ZS.exact_match.count() - self.df_ZS.exact_match.sum(), "restaurants found by Google API, not matching to respective restaurants from zs. and", self.df_ZS.name.count() - self.df_ZS.exact_match.count(), "restaurants, that could not be found at all based on the phone number from zs.")
+        print("This leaves us with", self.df_ZS.exact_match.count() - self.df_ZS.exact_match.sum(), "restaurants found by Google API, not matching to respective restaurants from zs., and", self.df_ZS.name.count() - self.df_ZS.exact_match.count(), "restaurants that could not be found at all based on the phone number from zs.")
 
     def plotReviews(self,outlier=5000):
         '''
